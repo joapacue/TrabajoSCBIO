@@ -28,13 +28,13 @@ x2=0
 y1=0
 y2=0
 respuesta=0
+dedos_reg = 0
+flag=0
+
 
 tam = 224
 
-kb=Controller()
-
-#dire_img = os.listdir('./Validacion')
-dire_img = ['Mano_abierta','Mano_cerrada']
+dire_img = ['Mano_abierta','Mano_cerrada'] #Labels de los resultados
 clase_manos = mp.solutions.hands
 manos = clase_manos.Hands()
 dibujo = mp.solutions.drawing_utils
@@ -42,12 +42,10 @@ dibujo = mp.solutions.drawing_utils
 cnn = load_model('../models/MobileNetV2_modificado_DataSet_224_Simple.h5')  #Cargamos el modelo
 
 
-#cnn.load_weights('../models/MobileNetV2_modificado_Pesos_DataSet_224_Simple.h5')  #Cargamos los pesos
-
 #### Abriendo e inicializando cámara
 cap = cv2.VideoCapture(0)
-dedos_reg = 0
-flag=0
+#### Inicializando salida por teclado
+kb=Controller()
 
 if not cap.isOpened():
     print("[ERROR] Error abriendo la cámara, es posible que otra aplicación la esté usando")
@@ -69,13 +67,14 @@ while True:
         break
 
     if resultado.multi_hand_landmarks: #Si hay algo en los resultados entramos al if
+
         for mano in resultado.multi_hand_landmarks:  #Buscamos la mano dentro de la lista de manos que nos da el descriptor
             for id, lm in enumerate(mano.landmark):  #Vamos a obtener la informacion de cada mano encontrada por el ID
-                #print(id,lm) #Como nos entregan decimales (Proporcion de la imagen) debemos pasarlo a pixeles
                 alto, ancho, c = frame.shape
                 corx, cory = int(lm.x*ancho), int(lm.y*alto) #Extraemos la ubicacion de cada punto que pertence a la mano en coordenadas
                 posiciones.append([id, corx, cory])
                 dibujo.draw_landmarks(frame, mano, clase_manos.HAND_CONNECTIONS)
+
         if len(posiciones) != 0:
                 pto_i5 = posiciones[9]  # Punto central
                 x1, y1 = (pto_i5[1] - round(tam / 2)), (pto_i5[2] - round(tam / 2))  # Obtenemos el punto incial y las longitudes
@@ -88,7 +87,9 @@ while True:
                 dedos_reg = copia[y1:y2, x1:x2]
                 dedos_reg = cv2.resize(dedos_reg, (tam, tam), interpolation=cv2.INTER_CUBIC)  # Redimensionamos las fotos
                 flag=1
-    # Leemos el tiempo actual en millis y sólo llamamos a la red 2 veces por seg
+    
+
+    ### Leemos el tiempo actual en millis y sólo llamamos a la red 2 veces por seg
     current_timestamp = time.time()
     if (current_timestamp > timestamp+0.5)&flag:
                 x = tf.keras.preprocessing.image.img_to_array(dedos_reg)  # Convertimos la imagen a una matriz
@@ -97,9 +98,9 @@ while True:
                 vector = cnn.predict(x)  # Va a ser un arreglo de 2 dimensiones, donde va a poner 1 en la clase que crea correcta
                 resultado = vector[0]  # ej:[0 0 0 0 0 0 1]
                 respuesta = np.argmax(resultado)  # Nos entrega el indice del valor mas alto 0-6
+                print('[DEBUG]',vector, resultado) # Mostramos el resultado
 
-                #print(vector, resultado)
-                print(resultado)
+                ### Dependiendo del resultado que saque la red presionamos la flecha de la derecha o de la izq
                 if(resultado[0]>0.5):
                      kb.press(Key.right)
                      kb.release(Key.right)
@@ -115,7 +116,7 @@ while True:
     cv2.imshow("Webcam", frame)
 
 
-
+    #### Abortamos la ejecución del programa al apretar la tecla Q
     if cv2.waitKey(1) & 0xFF == ord('q'):
         print("[INFO] Tecla Q presionada, abortando ejecución del programa")
         cap.release()
