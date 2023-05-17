@@ -87,6 +87,9 @@ while True:
                 dedos_reg = copia[y1:y2, x1:x2]
                 dedos_reg = cv2.resize(dedos_reg, (tam, tam), interpolation=cv2.INTER_CUBIC)  # Redimensionamos las fotos
                 flag=1
+    else:
+         flag=0
+         dedos_reg=0
     
 
     ### Leemos el tiempo actual en millis y sólo llamamos a la red 2 veces por seg
@@ -109,9 +112,10 @@ while True:
                      kb.release(Key.left)
                 timestamp=time.time()
 
-    colores = [(0, 255, 0), (0, 0, 255), (255, 0, 0), (255, 255, 0), (0, 255, 255), (255, 0, 255), (255, 255, 255)]
-    cv2.rectangle(frame, (x1, y1), (x2, y2), colores[respuesta], 3)
-    cv2.putText(frame, '{}'.format(dire_img[respuesta]), (x1, y1 - 5), 1, 1.3, colores[respuesta], 1, cv2.LINE_AA)
+    if flag:
+        colores = [(0, 255, 0), (0, 0, 255), (255, 0, 0), (255, 255, 0), (0, 255, 255), (255, 0, 255), (255, 255, 255)]
+        cv2.rectangle(frame, (x1, y1), (x2, y2), colores[respuesta], 3)
+        cv2.putText(frame, '{}'.format(dire_img[respuesta]), (x1, y1 - 5), 1, 1.3, colores[respuesta], 1, cv2.LINE_AA)
 
     cv2.imshow("Webcam", frame)
 
