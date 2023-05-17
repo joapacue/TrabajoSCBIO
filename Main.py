@@ -3,6 +3,7 @@
 
 #Imports necesarios para la red
 import numpy as np
+from pynput.keyboard import Key, Controller
 import matplotlib.pyplot as plt
 import tensorflow as tf
 from tensorflow import keras
@@ -29,6 +30,9 @@ y2=0
 respuesta=0
 
 tam = 224
+
+kb=Controller()
+
 #dire_img = os.listdir('./Validacion')
 dire_img = ['Mano_abierta','Mano_cerrada']
 clase_manos = mp.solutions.hands
@@ -94,7 +98,14 @@ while True:
                 resultado = vector[0]  # ej:[0 0 0 0 0 0 1]
                 respuesta = np.argmax(resultado)  # Nos entrega el indice del valor mas alto 0-6
 
-                print(vector, resultado)
+                #print(vector, resultado)
+                print(resultado)
+                if(resultado[0]>0.5):
+                     kb.press(Key.right)
+                     kb.release(Key.right)
+                if(resultado[1]>0.5):
+                     kb.press(Key.left)
+                     kb.release(Key.left)
                 timestamp=time.time()
 
     colores = [(0, 255, 0), (0, 0, 255), (255, 0, 0), (255, 255, 0), (0, 255, 255), (255, 0, 255), (255, 255, 255)]
@@ -103,8 +114,11 @@ while True:
 
     cv2.imshow("Webcam", frame)
 
+
+
     if cv2.waitKey(1) & 0xFF == ord('q'):
         print("[INFO] Tecla Q presionada, abortando ejecución del programa")
         cap.release()
         cv2.destroyAllWindows()
         break
+    
