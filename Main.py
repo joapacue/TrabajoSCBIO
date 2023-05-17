@@ -22,6 +22,12 @@ import mediapipe as mp
 from keras.models import load_model
 
 #### Carga inicial de variables
+x1=0
+x2=0
+y1=0
+y2=0
+respuesta=0
+
 tam = 224
 #dire_img = os.listdir('./Validacion')
 dire_img = ['Extras','Mano_abierta','Mano_cerrada']
@@ -86,10 +92,12 @@ while True:
                 respuesta = np.argmax(resultado)  # Nos entrega el indice del valor mas alto 0-6
 
                 print(vector, resultado)
-                colores = [(0, 255, 0), (0, 0, 255), (255, 0, 0), (255, 255, 0), (0, 255, 255), (255, 0, 255), (255, 255, 255)]
-                cv2.rectangle(frame, (x1, y1), (x2, y2), colores[respuesta], 3)
-                cv2.putText(frame, '{}'.format(dire_img[respuesta]), (x1, y1 - 5), 1, 1.3, colores[respuesta], 1, cv2.LINE_AA)
                 timestamp=time.time()
+
+    colores = [(0, 255, 0), (0, 0, 255), (255, 0, 0), (255, 255, 0), (0, 255, 255), (255, 0, 255), (255, 255, 255)]
+    cv2.rectangle(frame, (x1, y1), (x2, y2), colores[respuesta], 3)
+    cv2.putText(frame, '{}'.format(dire_img[respuesta]), (x1, y1 - 5), 1, 1.3, colores[respuesta], 1, cv2.LINE_AA)
+
     cv2.imshow("Webcam", frame)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
