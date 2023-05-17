@@ -30,13 +30,15 @@ respuesta=0
 
 tam = 224
 #dire_img = os.listdir('./Validacion')
-dire_img = ['Extras','Mano_abierta','Mano_cerrada']
+dire_img = ['Mano_abierta','Mano_cerrada']
 clase_manos = mp.solutions.hands
 manos = clase_manos.Hands()
 dibujo = mp.solutions.drawing_utils
 
-cnn = load_model('../models/MobileNetV2_modificado_DataSet_224_Aumentadox25_v2.h5')  #Cargamos el modelo
-cnn.load_weights('../models/MobileNetV2_modificado_Pesos_DataSet_224_Aumentadox25_v2.h5')  #Cargamos los pesos
+cnn = load_model('../models/MobileNetV2_modificado_DataSet_224_Simple.h5')  #Cargamos el modelo
+
+
+#cnn.load_weights('../models/MobileNetV2_modificado_Pesos_DataSet_224_Simple.h5')  #Cargamos los pesos
 
 #### Abriendo e inicializando cámara
 cap = cv2.VideoCapture(0)
@@ -87,6 +89,7 @@ while True:
     if (current_timestamp > timestamp+0.5)&flag:
                 x = tf.keras.preprocessing.image.img_to_array(dedos_reg)  # Convertimos la imagen a una matriz
                 x = np.expand_dims(x, axis=0)  # Agregamos nuevo eje
+                x = tf.keras.applications.mobilenet_v2.preprocess_input(x)
                 vector = cnn.predict(x)  # Va a ser un arreglo de 2 dimensiones, donde va a poner 1 en la clase que crea correcta
                 resultado = vector[0]  # ej:[0 0 0 0 0 0 1]
                 respuesta = np.argmax(resultado)  # Nos entrega el indice del valor mas alto 0-6
