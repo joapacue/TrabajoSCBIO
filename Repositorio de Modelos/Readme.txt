@@ -1,0 +1,2 @@
+Dado que este modelo supera el límite de subida de un fichero en GitHub se proporciona un enlace para poder descargarlo:
+https://drive.google.com/file/d/1ga9WKSU8KotrpZPBwsC9UoM6XUnF4ZMS/view?usp=share_link
